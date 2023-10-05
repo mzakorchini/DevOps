@@ -1,0 +1,123 @@
+{
+	"Version": "2012-10-17",
+	"Statement": [
+		{
+			"Effect": "Allow",
+			"Action": [
+				"iam:CreateRole",
+				"iam:AttachRolePolicy",
+				"iam:CreateInstanceProfile",
+				"access-analyzer:ListPolicyGenerations",
+				"iam:DeleteRole",
+				"iam:AddRoleToInstanceProfile",
+				"iam:DetachRolePolicy",
+				"iam:PutRolePolicy",
+				"cloudformation:CreateUploadBucket",
+				"compute-optimizer:GetEnrollmentStatus",
+				"devops-guru:GetResourceCollection",
+				"devops-guru:SearchInsights",
+				"ds:DescribeDirectories",
+				"kms:ListAliases",
+				"lambda:ListFunctions",
+				"ram:Get*",
+				"ram:ListResources",
+				"resource-groups:ListGroups",
+				"route53resolver:ListFirewallRuleGroupAssociations",
+				"secretsmanager:ListSecrets",
+				"securityhub:DescribeHub",
+				"ssm:Describe*",
+				"ssm:Get*",
+				"ssm:List*",
+				"ssm:StartSession",
+				"tag:GetResources"
+			],
+			"Resource": "*"
+		},
+		{
+			"Effect": "Allow",
+			"Action": [
+				"cloudformation:*"
+			],
+			"Resource": "arn:aws:cloudformation:*:*:stack/*/*"
+		},
+		{
+			"Effect": "Allow",
+			"Action": [
+				"cloudwatch:*Alarms"
+			],
+			"Resource": "arn:aws:cloudwatch:*:*:alarm:*"
+		},
+		{
+			"Effect": "Allow",
+			"Action": [
+				"cloudwatch:*Dashboard"
+			],
+			"Resource": "arn:aws:cloudwatch::*:dashboard/*"
+		},
+		{
+			"Effect": "Allow",
+			"Action": [
+				"kms:CreateGrant",
+				"kms:Decrypt",
+				"kms:DescribeKey",
+				"kms:GenerateDataKey"
+			],
+			"Resource": "arn:aws:kms:*:*:key/*"
+		},
+		{
+			"Effect": "Allow",
+			"Action": "logs:DescribeMetricFilters",
+			"Resource": "arn:aws:logs:*:*:log-group:*"
+		},
+		{
+			"Effect": "Allow",
+			"Action": [
+				"secretsmanager:CreateSecret",
+				"secretsmanager:DescribeSecret",
+				"secretsmanager:RotateSecret",
+				"secretsmanager:TagResource"
+			],
+			"Resource": "arn:aws:secretsmanager:*:*:secret:*"
+		},
+		{
+            "Sid": "limitedSize",
+            "Effect": "Deny",
+            "Action": "ec2:RunInstances",
+            "Resource": "arn:aws:ec2:*:*:instance/*",
+            "Condition": {
+                "ForAnyValue:StringNotLike": {
+                    "ec2:InstanceType": [
+                        "*.nano",
+                        "*.small",
+                        "*.micro",
+                        "m6g.medium"
+                    ]
+                }
+            }
+        },
+		{
+			"Sid": "DenyLargeCreate",
+			"Effect": "Deny",
+			"Action": "rds:CreateDBInstance",
+			"Resource": "*",
+			"Condition": {
+			   "ForAnyValue:StringNotLike": {
+				  "rds:DatabaseClass": [
+					 "db.t3.small"
+				  ]
+			   }
+			}
+		 },
+		 {
+			"Sid": "DenyPIOPSCreate",
+			"Effect": "Deny",
+			"Action": "rds:CreateDBInstance",
+			"Resource": "*",
+			"Condition": {
+			   "NumericNotEquals": {
+				  "rds:Piops": "0"
+			   }
+			}
+		 }
+	]
+}
